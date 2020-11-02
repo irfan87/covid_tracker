@@ -11,13 +11,18 @@ import LineGraph from "./components/Graph/LineGraph";
 import InfoBox from "./components/InfoBox/InfoBox";
 import Map from "./components/Map/Map";
 import Table from "./components/Table/Table";
-import { sortData } from "./utils/utils";
+import { prettyPrintStat, sortData } from "./utils/utils";
+
+import "leaflet/dist/leaflet.css";
 
 function App() {
 	const [countries, setCountries] = useState([]);
 	const [country, setCountry] = useState("worldwide");
 	const [countryInfo, setCountryInfo] = useState({});
 	const [tableData, setTableData] = useState([]);
+	const [mapCenter, setMapCenter] = useState({ lat: 2.5, lng: 112.5 });
+	const [mapZoom, setMapZoom] = useState(4);
+	const [mapCountries, setMapCountries] = useState([]);
 
 	// get the countries to preview into the dropdown menu
 	useEffect(() => {
@@ -32,6 +37,7 @@ function App() {
 
 					const sortedData = sortData(data);
 					setTableData(sortedData);
+					setMapCountries(data);
 					setCountries(countries);
 				})
 				.catch((err) => console.error(err.message));
@@ -57,7 +63,7 @@ function App() {
 		const url =
 			countryCode === "worldwide"
 				? "https://disease.sh/v3/covid-19/all"
-				: `https://disease.sh/v3/covid-19/countries/${countryCode}?strict=true`;
+				: `https://disease.sh/v3/covid-19/countries/${countryCode}`;
 
 		await fetch(url)
 			.then((res) => res.json())
@@ -66,6 +72,11 @@ function App() {
 
 				// all of the data from the country response
 				setCountryInfo(data);
+
+				// change the selected country into the map
+				setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
+
+				setMapZoom(4);
 			})
 			.catch((err) => console.error(err.message));
 	};
@@ -94,22 +105,22 @@ function App() {
 				<div className="app__stats">
 					<InfoBox
 						title="Covid-19 Cases"
-						total={countryInfo.cases}
-						cases={countryInfo.todayCases}
+						total={prettyPrintStat(countryInfo.cases)}
+						cases={prettyPrintStat(countryInfo.todayCases)}
 					/>
 					<InfoBox
 						title="Recovered"
-						total={countryInfo.recovered}
-						cases={countryInfo.todayRecovered}
+						total={prettyPrintStat(countryInfo.recovered)}
+						cases={prettyPrintStat(countryInfo.todayRecovered)}
 					/>
 					<InfoBox
 						title="Deaths"
-						total={countryInfo.deaths}
-						cases={countryInfo.todayDeaths}
+						total={prettyPrintStat(countryInfo.deaths)}
+						cases={prettyPrintStat(countryInfo.todayDeaths)}
 					/>
 				</div>
 				{/* Map */}
-				<Map />
+				<Map countries={mapCountries} center={mapCenter} zoom={mapZoom} />
 			</div>
 			<Card className="app__right">
 				<CardContent>
