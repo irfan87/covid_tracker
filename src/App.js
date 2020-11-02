@@ -7,6 +7,7 @@ import {
 } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import "./App.css";
+import LineGraph from "./components/Graph/LineGraph";
 import InfoBox from "./components/InfoBox/InfoBox";
 import Map from "./components/Map/Map";
 import Table from "./components/Table/Table";
@@ -116,6 +117,7 @@ function App() {
 					<Table countries={tableData} />
 					<h3>World Wide New Cases</h3>
 					{/* Graph */}
+					<LineGraph casesType="cases" />
 				</CardContent>
 			</Card>
 		</div>
