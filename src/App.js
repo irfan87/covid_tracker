@@ -23,6 +23,7 @@ function App() {
 	const [mapCenter, setMapCenter] = useState({ lat: 2.5, lng: 112.5 });
 	const [mapZoom, setMapZoom] = useState(4);
 	const [mapCountries, setMapCountries] = useState([]);
+	const [casesType, setCasesType] = useState("cases");
 
 	// get the countries to preview into the dropdown menu
 	useEffect(() => {
@@ -104,31 +105,44 @@ function App() {
 				</div>
 				<div className="app__stats">
 					<InfoBox
+						active={casesType === "cases"}
+						isRed
+						onClick={(e) => setCasesType("cases")}
 						title="Covid-19 Cases"
 						total={prettyPrintStat(countryInfo.cases)}
 						cases={prettyPrintStat(countryInfo.todayCases)}
 					/>
 					<InfoBox
+						active={casesType === "recovered"}
+						onClick={(e) => setCasesType("recovered")}
 						title="Recovered"
 						total={prettyPrintStat(countryInfo.recovered)}
 						cases={prettyPrintStat(countryInfo.todayRecovered)}
 					/>
 					<InfoBox
+						active={casesType === "deaths"}
+						isRed
+						onClick={(e) => setCasesType("deaths")}
 						title="Deaths"
 						total={prettyPrintStat(countryInfo.deaths)}
 						cases={prettyPrintStat(countryInfo.todayDeaths)}
 					/>
 				</div>
 				{/* Map */}
-				<Map countries={mapCountries} center={mapCenter} zoom={mapZoom} />
+				<Map
+					casesType={casesType}
+					countries={mapCountries}
+					center={mapCenter}
+					zoom={mapZoom}
+				/>
 			</div>
 			<Card className="app__right">
 				<CardContent>
 					<h3>Live Cases by Country</h3>
 					<Table countries={tableData} />
-					<h3>World Wide New Cases</h3>
+					<h3 className="app__graphTitle">Worldwide new {casesType}</h3>
 					{/* Graph */}
-					<LineGraph casesType="cases" />
+					<LineGraph className="app__graph" casesType={casesType} />
 				</CardContent>
 			</Card>
 		</div>
